@@ -1,0 +1,44 @@
+
+networks:
+  bunker-network:
+    external: true
+
+volumes:
+  postgres-data:
+  nginx-logs:
+
+services:
+
+  nginx:
+    image: nginx:alpine
+    container_name: bunker-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - nginx-logs:/var/log/nginx
+    networks:
+      - bunker-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: bunker-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - bunker-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
