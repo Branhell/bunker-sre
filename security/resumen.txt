@@ -1,0 +1,7 @@
+=== RESUMEN ESCANEO DE SEGURIDAD ===
+Fecha: Sun May 31 01:39:35 -05 2026
+
+nginx:alpine     → 0 vulnerabilidades ✅
+postgres:16-alpine → 33 vulnerabilidades en gosu ⚠️
+  CRITICAL: 1 | HIGH: 14 | MEDIUM: 16 | LOW: 2
+  Status: fixed (actualizar imagen cuando esté disponible)

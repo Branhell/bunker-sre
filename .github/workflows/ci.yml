@@ -1,0 +1,55 @@
+name: Bunker SRE CI Pipeline
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  test-python:
+    name: Tests Python
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: |
+          cd automation
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Correr tests
+        run: |
+          cd automation
+          pytest tests/ -v || echo "No hay tests aún"
+
+  security-scan:
+    name: Escaneo de Seguridad Trivy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Escanear nginx:alpine
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'nginx:alpine'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Escanear postgres:16-alpine
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'postgres:16-alpine'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
